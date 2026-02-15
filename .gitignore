@@ -39,3 +39,9 @@ Thumbs.db
 # Project specific
 *.log
 logs/
+
+# Workspace (cloned user repos)
+workspace/
+
+# Runtime state
+.last_project

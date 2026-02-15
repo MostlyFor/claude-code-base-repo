@@ -1,61 +1,80 @@
 #!/bin/bash
 
-# Claude Code Template Setup Script
+# setup-claude.sh - Claude Code 설정을 대상 프로젝트에 주입하는 유틸리티
+# Usage: ./scripts/setup-claude.sh <target-dir>
 
 set -e
 
-echo "=== Claude Code Template Setup ==="
-echo ""
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Check if CLAUDE.md exists
-if [ -f "CLAUDE.md" ]; then
-    echo "[!] CLAUDE.md already exists. Skipping..."
-else
-    if [ -f "CLAUDE.md.template" ]; then
-        echo "[*] Creating CLAUDE.md from template..."
-        cp CLAUDE.md.template CLAUDE.md
-        echo "[+] CLAUDE.md created. Please customize it for your project."
+# ─── Colors ──────────────────────────────────────────────
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+ok()   { echo -e "${GREEN}[+]${NC} $1"; }
+skip() { echo -e "${YELLOW}[-]${NC} $1 (이미 존재, 스킵)"; }
+
+# ─── Argument check ─────────────────────────────────────
+TARGET_DIR="$1"
+
+if [ -z "$TARGET_DIR" ]; then
+    echo "Usage: $0 <target-dir>"
+    echo ""
+    echo "대상 프로젝트 디렉토리에 .claude/ 설정을 주입합니다."
+    exit 1
+fi
+
+if [ ! -d "$TARGET_DIR" ]; then
+    echo "[x] 디렉토리가 존재하지 않습니다: $TARGET_DIR"
+    exit 1
+fi
+
+# ─── Create .claude directory ────────────────────────────
+mkdir -p "$TARGET_DIR/.claude/skills"
+mkdir -p "$TARGET_DIR/.claude/agents"
+
+# ─── Copy skills (skip existing) ────────────────────────
+for skill in "$REPO_DIR/.claude/skills/"*.md; do
+    [ -f "$skill" ] || continue
+    name=$(basename "$skill")
+    if [ -f "$TARGET_DIR/.claude/skills/$name" ]; then
+        skip "skills/$name"
     else
-        echo "[!] CLAUDE.md.template not found."
+        cp "$skill" "$TARGET_DIR/.claude/skills/$name"
+        ok "skills/$name 복사 완료"
     fi
-fi
+done
 
-# Check .claude directory
-if [ -d ".claude" ]; then
-    echo "[+] .claude directory found."
-
-    # List skills
-    if [ -d ".claude/skills" ]; then
-        echo ""
-        echo "Available skills:"
-        for skill in .claude/skills/*.md; do
-            if [ -f "$skill" ]; then
-                name=$(basename "$skill" .md)
-                echo "  - /$name"
-            fi
-        done
+# ─── Copy agents (skip existing) ────────────────────────
+for agent in "$REPO_DIR/.claude/agents/"*.md; do
+    [ -f "$agent" ] || continue
+    name=$(basename "$agent")
+    if [ -f "$TARGET_DIR/.claude/agents/$name" ]; then
+        skip "agents/$name"
+    else
+        cp "$agent" "$TARGET_DIR/.claude/agents/$name"
+        ok "agents/$name 복사 완료"
     fi
+done
 
-    # List agents
-    if [ -d ".claude/agents" ]; then
-        echo ""
-        echo "Available agents:"
-        for agent in .claude/agents/*.md; do
-            if [ -f "$agent" ]; then
-                name=$(basename "$agent" .md)
-                echo "  - $name"
-            fi
-        done
-    fi
+# ─── Copy settings.json (skip if exists) ────────────────
+if [ -f "$TARGET_DIR/.claude/settings.json" ]; then
+    skip "settings.json"
 else
-    echo "[!] .claude directory not found."
+    cp "$REPO_DIR/.claude/settings.json" "$TARGET_DIR/.claude/settings.json"
+    ok "settings.json 복사 완료"
 fi
 
-echo ""
-echo "=== Setup Complete ==="
-echo ""
-echo "Next steps:"
-echo "1. Edit CLAUDE.md to match your project"
-echo "2. Run 'claude' to start Claude Code"
-echo "3. Use '/skills' to see available skills"
-echo "4. Use '/agents' to see available agents"
+# ─── Create CLAUDE.md from template (skip if exists) ────
+if [ -f "$TARGET_DIR/CLAUDE.md" ]; then
+    skip "CLAUDE.md"
+else
+    if [ -f "$REPO_DIR/CLAUDE.md.template" ]; then
+        cp "$REPO_DIR/CLAUDE.md.template" "$TARGET_DIR/CLAUDE.md"
+        ok "CLAUDE.md 생성 완료 (템플릿에서 복사)"
+    fi
+fi
+
+ok "설정 주입 완료"
