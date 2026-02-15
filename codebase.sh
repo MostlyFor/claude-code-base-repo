@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# codebase.sh - Docker sandbox로 안전한 바이브 코딩을 시작하는 CLI 도구
-# Usage: ./codebase.sh <git-url|local-path|--resume> [options]
+# codebase.sh - sandbox 안에서 프로젝트를 세팅하는 CLI 도구
+# Usage: ./codebase.sh <git-url|local-path|--resume>
 
 set -e
 
@@ -25,7 +25,7 @@ error() { echo -e "${RED}[x]${NC} $1"; }
 
 usage() {
     cat <<'EOF'
-Usage: ./codebase.sh <target> [options]
+Usage: ./codebase.sh <target>
 
 Target:
   <git-url>       Git 레포지토리 URL (workspace/에 clone)
@@ -34,18 +34,16 @@ Target:
 
 Options:
   --help, -h      이 도움말 출력
-  --dry-run       실제 sandbox 실행 없이 설정만 확인
 
 Examples:
   ./codebase.sh https://github.com/user/repo
-  ./codebase.sh ~/my-project
+  ./codebase.sh ./my-project
   ./codebase.sh --resume
 EOF
 }
 
 # ─── Argument parsing ────────────────────────────────────
 TARGET=""
-DRY_RUN=false
 
 if [ $# -eq 0 ]; then
     usage
@@ -67,10 +65,6 @@ while [ $# -gt 0 ]; do
             info "마지막 프로젝트 이어서 작업: $TARGET"
             shift
             ;;
-        --dry-run)
-            DRY_RUN=true
-            shift
-            ;;
         -*)
             error "알 수 없는 옵션: $1"
             usage
@@ -89,34 +83,11 @@ if [ -z "$TARGET" ]; then
     exit 1
 fi
 
-# ─── Prerequisite checks ────────────────────────────────
+# ─── Resolve project path ───────────────────────────────
 echo ""
 echo -e "${BOLD}=== codebase.sh ===${NC}"
 echo ""
 
-# Check Docker Desktop
-info "Docker Desktop 확인 중..."
-if ! command -v docker &> /dev/null; then
-    error "Docker가 설치되어 있지 않습니다."
-    echo "  설치: https://docs.docker.com/desktop/install/mac-install/"
-    exit 1
-fi
-
-if ! docker info &> /dev/null 2>&1; then
-    error "Docker Desktop이 실행 중이 아닙니다. Docker Desktop을 시작해주세요."
-    exit 1
-fi
-
-# Check docker sandbox command
-if ! docker sandbox ls &> /dev/null 2>&1; then
-    error "docker sandbox 명령을 사용할 수 없습니다."
-    echo "  Docker Desktop 4.57 이상이 필요합니다."
-    echo "  확인: docker --version"
-    exit 1
-fi
-ok "Docker Desktop 준비 완료"
-
-# ─── Resolve project path ───────────────────────────────
 PROJECT_PATH=""
 
 # Check if target is a git URL
@@ -139,9 +110,6 @@ if [[ "$TARGET" =~ ^https?:// ]] || [[ "$TARGET" =~ ^git@ ]]; then
     ok "프로젝트 준비 완료: $PROJECT_PATH"
 else
     # Local path
-    # Expand ~ to home directory
-    TARGET="${TARGET/#\~/$HOME}"
-
     if [ ! -d "$TARGET" ]; then
         error "디렉토리가 존재하지 않습니다: $TARGET"
         exit 1
@@ -163,18 +131,9 @@ echo ""
 echo -e "${BOLD}=== 준비 완료 ===${NC}"
 echo ""
 echo -e "  프로젝트:  ${GREEN}$PROJECT_PATH${NC}"
-echo -e "  Skills:    /fix-issue, /review"
+echo -e "  Skills:    /fix-issue, /review, /test-gen, /debug, /refactor"
 echo -e "  Agents:    test-runner"
 echo -e "  Hooks:     Python auto-lint (ruff)"
 echo ""
-
-# ─── Launch sandbox ──────────────────────────────────────
-if [ "$DRY_RUN" = true ]; then
-    info "[dry-run] 다음 명령어가 실행될 예정입니다:"
-    echo "  docker sandbox run claude $PROJECT_PATH"
-    exit 0
-fi
-
-info "Docker Sandbox 시작 중..."
+echo -e "  다음 단계: ${BOLD}cd $PROJECT_PATH${NC} 후 작업을 시작하세요."
 echo ""
-exec docker sandbox run claude "$PROJECT_PATH"

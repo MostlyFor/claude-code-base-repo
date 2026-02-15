@@ -6,7 +6,7 @@
 [프로젝트 설명 1-2문장]
 
 ## Tech Stack
-- Language: Python 3.1
+- Language: Python 3.x
 - Framework: [FastAPI/Django/etc.]
 - Database: [PostgreSQL/etc.]
 - Testing: pytest

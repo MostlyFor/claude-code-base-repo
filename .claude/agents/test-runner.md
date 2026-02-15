@@ -12,9 +12,7 @@ model: sonnet
 ## Workflow
 
 ### 1. 테스트 실행
-```bash
-pytest -v --tb=short
-```
+- CLAUDE.md에 정의된 테스트 명령어 실행 (없으면 `pytest -v --tb=short`)
 
 ### 2. 실패 분석
 - 에러 메시지 파악
@@ -32,9 +30,7 @@ pytest -v --tb=short
 - 환경 문제: 설정 수정
 
 ### 5. 검증
-```bash
-pytest -v  # 전체 테스트 통과 확인
-```
+- CLAUDE.md에 정의된 테스트 명령어로 전체 테스트 통과 확인 (없으면 `pytest -v`)
 
 ## Output Format
 ```

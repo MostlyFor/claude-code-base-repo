@@ -31,10 +31,8 @@ GitHub 이슈를 분석하고 수정합니다: $ARGUMENTS
    - 기존 코드 스타일 유지
 
 5. **검증**
-   ```bash
-   pytest -v  # 테스트 통과 확인
-   ruff check .  # 린트 통과 확인
-   ```
+   - CLAUDE.md에 정의된 테스트 명령어 실행 (없으면 `pytest -v`)
+   - CLAUDE.md에 정의된 린터 실행 (없으면 `ruff check .`)
 
 6. **커밋 및 PR**
    - 이슈 번호 참조하여 커밋
