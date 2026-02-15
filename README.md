@@ -64,6 +64,28 @@ sandbox 안에서 직접 프로젝트를 clone하고 작업할 수 있지만, �
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) 설치 및 실행
 - [Docker Sandbox](https://docs.docker.com/ai/sandboxes/) 기능 활성화
 
+## push.sh 사용법
+
+sandbox에서 작업한 커밋을 호스트를 통해 안전하게 push합니다.
+인증 정보(토큰, SSH 키)가 sandbox 안으로 들어가지 않습니다.
+
+```bash
+# 자동 감지 (sandbox + 프로젝트 자동 탐색)
+./push.sh
+
+# sandbox 지정
+./push.sh <sandbox-name>
+
+# 모두 지정
+./push.sh <sandbox-name> /path/to/project
+```
+
+**동작 흐름:**
+1. sandbox에서 `git bundle` 생성 (미push 커밋만 추출)
+2. bundle을 호스트로 복사
+3. 호스트의 git 인증으로 push
+4. 임시 파일 정리
+
 ## codebase.sh 사용법
 
 sandbox 내부에서 프로젝트를 세팅하는 CLI 도구입니다.
@@ -170,6 +192,7 @@ Read, Grep, Glob
 ```
 claude-code-base-repo/
 ├── sandbox.sh               # 호스트용 sandbox 생성 wrapper
+├── push.sh                  # 호스트용 안전한 push wrapper
 ├── install.sh               # 글로벌 설치 스크립트
 ├── codebase.sh              # sandbox 내부 프로젝트 세팅 CLI
 ├── CLAUDE.md.template       # 프로젝트 CLAUDE.md 템플릿
