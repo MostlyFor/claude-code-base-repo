@@ -1,0 +1,62 @@
+# Project: [프로젝트명]
+
+## Overview
+[프로젝트 설명 1-2문장]
+
+## Tech Stack
+- Language: Python 3.1
+- Framework: [FastAPI/Django/etc.]
+- Database: [PostgreSQL/etc.]
+- Testing: pytest
+
+## Commands
+
+### Development
+```bash
+# 서버 실행
+[명령어]
+
+# 테스트
+pytest -v
+
+# 린트
+ruff check .
+
+# 포맷
+ruff format .
+```
+
+### Database
+```bash
+# 마이그레이션
+[명령어]
+```
+
+## Architecture
+[주요 디렉토리 구조 설명]
+
+```
+src/
+├── api/        # API 엔드포인트
+├── models/     # 데이터 모델
+├── services/   # 비즈니스 로직
+└── utils/      # 유틸리티
+```
+
+## Code Style
+- Type hints 필수
+- Docstrings: Google style
+- 테스트 파일: `test_*.py`
+
+## Important Rules
+- IMPORTANT: [프로젝트 특화 규칙]
+- YOU MUST: [반드시 지켜야 할 것]
+
+## Environment Variables
+필수 환경 변수:
+- `DATABASE_URL`: DB 연결 문자열
+- `SECRET_KEY`: 암호화 키
+
+## References
+- API 문서: @docs/api.md
+- 아키텍처: @docs/architecture.md

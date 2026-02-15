@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CC_TOOL_ARG_FILE_PATH\" == *.py ]]; then ruff check --fix \"$CC_TOOL_ARG_FILE_PATH\" 2>/dev/null && ruff format \"$CC_TOOL_ARG_FILE_PATH\" 2>/dev/null; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
